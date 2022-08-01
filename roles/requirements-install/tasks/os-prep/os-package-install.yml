@@ -1,0 +1,48 @@
+---
+- name: Install Docker
+  block:
+    - name: Reference
+      debug:
+        msg: "Starting Docker install per https://docs.docker.com/engine/install/centos/"
+      run_once: True
+      delegate_to: localhost
+
+    - name: Remove old versions
+      dnf:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: absent
+      register: result_remove_docker
+
+    - name: Install Docker
+      dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: latest
+      register: result_install_docker
+
+    - name: Start Docker
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+        masked: no
+        enabled: yes
+
+    - name: Install other packages
+      dnf:
+        name:
+          - git
+          - telnet
+        state: latest
+...

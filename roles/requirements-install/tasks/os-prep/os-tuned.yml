@@ -1,0 +1,71 @@
+---
+- name: Install tuned
+  dnf:
+    name: tuned
+    state: latest
+
+- name: Disable tuning daemon and ktune
+  command:
+    cmd: tuned-adm off
+  ignore_errors: True
+
+- name: Disable dynamic tuning
+  lineinfile:
+    path: "/etc/tuned/tuned-main.conf"
+    regexp: "^daemon ="
+    line: "daemon = 0"
+
+- name: Create tuning profile
+  block:
+    - name: Create tuned profile directory
+      file:
+        name: "/etc/tuned/{{ TUNED_PROFILE }}"
+        state: directory
+
+    - name: Copy profile based on throughput-performance
+      copy:
+        remote_src: yes
+        src: "/usr/lib/tuned/throughput-performance/tuned.conf"
+        dest: "/etc/tuned/{{ TUNED_PROFILE }}/tuned.conf"
+
+# https://redis.io/docs/manual/admin/
+- name: Apply Redis specific requirements
+  block:
+    - name: Make sure transparent hugepage is disabled
+      lineinfile:
+        path: "/etc/tuned/{{ TUNED_PROFILE }}/tuned.conf"
+        regexp: "^transparent_hugepages="
+        line: "transparent_hugepages=never"
+
+- name: Disable IPv6
+  block:
+    - name: Disable IPv6 all interfaces
+      lineinfile:
+        path: "/etc/tuned/{{ TUNED_PROFILE }}/tuned.conf"
+        insertafter: "^\\[sysctl\\]"
+        regexp: "^net.ipv6.conf.all.disable_ipv6="
+        line: "net.ipv6.conf.all.disable_ipv6=1"
+
+    - name: Disable IPv6 as default
+      lineinfile:
+        path: "/etc/tuned/{{ TUNED_PROFILE }}/tuned.conf"
+        insertafter: "^\\[sysctl\\]"
+        regexp: "^net.ipv6.conf.default.disable_ipv6="
+        line: "net.ipv6.conf.default.disable_ipv6=1"
+
+- name: Activate tuned profile
+  command:
+    cmd: "tuned-adm profile {{ TUNED_PROFILE }}"
+
+- name: Check tuned profile is loaded
+  block:
+    - name: Get current profile
+      command:
+        cmd: tuned-adm active
+      register: result_tuned_active
+
+    - name: Check correct profile is used
+      assert:
+        that:
+          - result_tuned_active.stdout_lines is search("{{ TUNED_PROFILE }}")
+...

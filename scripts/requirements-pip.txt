@@ -1,0 +1,6 @@
+pip
+wheel
+setuptools
+jmespath
+docker
+ansible==6.1.0

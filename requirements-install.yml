@@ -1,0 +1,21 @@
+---
+- name: "Requirements Install"
+  hosts: all
+  gather_facts: False
+
+  pre_tasks:
+    - debug:
+        msg: "Executing playbook {{ ansible_play_name }} against {{ ansible_play_batch }}"
+      run_once: True
+
+  roles:
+    - requirements-install
+
+  post_tasks:
+    - debug:
+        msg:
+          - "######################################################################"
+          - "Finished executing playbook {{ ansible_play_name }}"
+          - "######################################################################"
+      run_once: True
+...

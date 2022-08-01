@@ -1,0 +1,30 @@
+---
+- name: Install and upgrade Ansible and PIP packages per requirements file
+  block:
+    - name: Get default directory
+      command:
+        cmd: pwd
+      register: result_home
+
+    - name: Copy requirements file
+      copy:
+        src: "{{ playbook_dir }}/scripts/{{ item }}"
+        dest: "{{ result_home['stdout'] }}/{{ item }}"
+      loop:
+        - requirements-pip.txt
+        - requirements-ansible.yml
+
+    - name: Install PIP packages per requirements file
+      pip:
+        requirements: "{{ result_home['stdout'] }}/requirements-pip.txt"
+        virtualenv: "{{ result_home['stdout'] }}/venv"
+        virtualenv_command: /usr/bin/python3 -m venv
+        state: latest
+
+    - name: Install Ansible Galaxy collections per requirements file
+      community.general.ansible_galaxy_install:
+        requirements_file: "{{ result_home['stdout'] }}/requirements-ansible.yml"
+        type: collection
+      environment:
+        PATH: "{{ result_home['stdout'] }}/venv/bin"
+...

@@ -1,0 +1,24 @@
+---
+- name: Apply tuning
+  import_tasks: os-prep/os-tuned.yml
+
+- name: Remove RHEL proprietary container tools to use Docker
+  dnf:
+    name:
+      - podman
+      - buildah
+      - skopeo
+    state: absent
+
+- name: Patch Operating System
+  import_tasks: os-prep/os-patch.yml
+
+- name: Add additional repo
+  import_tasks: os-prep/os-repo-mgmt.yml
+
+- name: Install OS packages
+  import_tasks: os-prep/os-package-install.yml
+
+- name: Install Python packages
+  import_tasks: ansible-python-prep/package-install.yml
+...

@@ -1,0 +1,14 @@
+---
+- name: Update system
+  dnf:
+    name: '*'
+    state: latest
+    update_cache: yes
+  register: result_dnf_latest
+
+- name: Reboot machine if patch have been done
+  reboot:
+    post_reboot_delay: 150
+    reboot_timeout: 600
+  when: result_dnf_latest['changed'] == True
+...

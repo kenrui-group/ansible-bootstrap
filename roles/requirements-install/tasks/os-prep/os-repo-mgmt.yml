@@ -1,0 +1,6 @@
+---
+# https://github.com/ansible/ansible/issues/46963
+- name: OS Repo Mgmt
+  command:
+    cmd: dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+...

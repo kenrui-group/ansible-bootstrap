@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-source venv/bin/activate
+python3 -m venv ansible
+source ansible/bin/activate
 ENV=UAT
 USER=uat
 export ANSIBLE_CALLBACKS_ENABLED=profile_tasks

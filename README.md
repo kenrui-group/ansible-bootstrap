@@ -9,7 +9,6 @@ ansible-bootstrap helps to get Python, PIP, Ansible settings consistent across e
 * Enable static tuned profile with basic settings.
 
 # Requirements
-* Python venv environment needs to be created first.  This can be done via `python3 -m venv venv`.
 * Create appropriate inventory files (ie inventory/servers-${ENV}.yml), where ${ENV} is dev, uat, etc.
 
 # License

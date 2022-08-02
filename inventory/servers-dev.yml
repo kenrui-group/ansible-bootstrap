@@ -1,0 +1,8 @@
+---
+dev:
+  vars:
+    env: dev
+  hosts:
+    dev:
+      ansible_host: 10.1.2.3
+...
